@@ -86,6 +86,7 @@ private:
   int detectedBoardCount;
   int scriptCount;
   int activeSweepCount;
+  int scriptRecursionDepth;
   
   // Common I2C addresses for PCA9685 boards
   uint8_t commonAddresses[8] = {0x40, 0x41, 0x42, 0x43, 0x44, 0x45, 0x46, 0x47};

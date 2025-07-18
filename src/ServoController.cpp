@@ -4,6 +4,7 @@ ServoController::ServoController() {
   detectedBoardCount = 0;
   scriptCount = 0;
   activeSweepCount = 0;
+  scriptRecursionDepth = 0;
   
   // Initialize all board pointers to nullptr
   for (int i = 0; i < MAX_BOARDS; i++) {

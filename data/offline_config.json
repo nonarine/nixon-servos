@@ -209,6 +209,13 @@
       "description": "test",
       "commands": "repeat 3 sweep 0 0 0 100 1000",
       "enabled": true
+    },
+    {
+      "index": 1,
+      "name": "sweep",
+      "description": "sweep",
+      "commands": "sweep 0 0 0 100 1000; sweep 0 0 100 0 1000",
+      "enabled": true
     }
   ]
 }

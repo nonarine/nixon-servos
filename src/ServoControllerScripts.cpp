@@ -76,6 +76,12 @@ bool ServoController::executeScript(int index) {
 }
 
 bool ServoController::executeScript(const String& name) {
+  // Prevent infinite recursion
+  if (scriptRecursionDepth >= 5) {
+    DebugConsole::getInstance().log("Script recursion limit exceeded (max 5): " + name, "error");
+    return false;
+  }
+  
   // Find script by name
   int index = -1;
   for (int i = 0; i < scriptCount; i++) {
@@ -94,6 +100,9 @@ bool ServoController::executeScript(const String& name) {
     DebugConsole::getInstance().log("Script disabled: " + name, "error");
     return false;
   }
+  
+  // Increment recursion depth
+  scriptRecursionDepth++;
   
   DebugConsole::getInstance().log("Executing script: " + name, "info");
   
@@ -144,16 +153,34 @@ bool ServoController::executeScript(const String& name) {
   
   bool success = false;
   if (commandCount > 0) {
-    // Start command sequence for sequential execution
-    success = startCommandSequence(commandArray, commandCount);
-    if (success) {
-      DebugConsole::getInstance().log("Started command sequence with " + String(commandCount) + " commands", "success");
+    // If we're already in a sequence (recursion), append commands to existing sequence
+    if (commandSequence.active && scriptRecursionDepth > 1) {
+      // Append commands to current sequence
+      int remainingSlots = 100 - commandSequence.totalCount;
+      int commandsToAdd = (commandCount > remainingSlots) ? remainingSlots : commandCount;
+      
+      for (int i = 0; i < commandsToAdd; i++) {
+        commandSequence.commands[commandSequence.totalCount + i] = commandArray[i];
+      }
+      commandSequence.totalCount += commandsToAdd;
+      
+      DebugConsole::getInstance().log("Appended " + String(commandsToAdd) + " commands to existing sequence", "success");
+      success = true;
     } else {
-      DebugConsole::getInstance().log("Failed to start command sequence", "error");
+      // Start new command sequence for sequential execution
+      success = startCommandSequence(commandArray, commandCount);
+      if (success) {
+        DebugConsole::getInstance().log("Started command sequence with " + String(commandCount) + " commands", "success");
+      } else {
+        DebugConsole::getInstance().log("Failed to start command sequence", "error");
+      }
     }
   } else {
     DebugConsole::getInstance().log("No valid commands found in script", "error");
   }
+  
+  // Decrement recursion depth
+  scriptRecursionDepth--;
   
   // Clean up
   delete[] commandArray;

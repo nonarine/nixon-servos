@@ -74,8 +74,15 @@ String ServoController::executeCommandImmediate(const String& command) {
     // Sleep commands should not be executed immediately
     return "Error: Sleep command cannot be executed immediately";
   } else if (mainCommand == "script") {
-    // Script commands should not be executed immediately to avoid recursion
-    return "Error: Script command cannot be executed immediately";
+    // Execute script by name
+    if (args.length() == 0) {
+      return "Error: script command requires a script name. Usage: script <name>";
+    }
+    if (executeScript(args)) {
+      return "Success: Executed script '" + args + "'";
+    } else {
+      return "Error: Script '" + args + "' not found or disabled";
+    }
   } else {
     return "Error: Unknown command '" + mainCommand + "'. Type 'help' for available commands.";
   }
