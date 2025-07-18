@@ -171,7 +171,7 @@ function deleteScript(index) {
 function executeScript(scriptName) {
     addDebugMessage('Executing script: ' + scriptName, 'info');
     
-    fetch('/api/scripts/execute', {
+    fetch('/api/execute-script', {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json',

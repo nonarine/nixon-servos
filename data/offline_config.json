@@ -1,0 +1,206 @@
+{
+  "success": true,
+  "boards": [
+    {
+      "index": 0,
+      "address": 64,
+      "name": "PCA9685 @0x40",
+      "enabled": true,
+      "servos": [
+        {
+          "index": 0,
+          "enabled": true,
+          "center": 50,
+          "range": 50,
+          "initPosition": 50,
+          "isPair": true,
+          "pairBoard": 0,
+          "pairServo": 1,
+          "isPairMaster": true,
+          "name": "Board 0 Servo 0"
+        },
+        {
+          "index": 1,
+          "enabled": true,
+          "center": 50,
+          "range": 50,
+          "initPosition": 50,
+          "isPair": false,
+          "pairBoard": -1,
+          "pairServo": -1,
+          "isPairMaster": false,
+          "name": "Board 0 Servo 1"
+        },
+        {
+          "index": 2,
+          "enabled": false,
+          "center": 50,
+          "range": 50,
+          "initPosition": 50,
+          "isPair": false,
+          "pairBoard": -1,
+          "pairServo": -1,
+          "isPairMaster": false,
+          "name": "Board 0 Servo 2"
+        },
+        {
+          "index": 3,
+          "enabled": false,
+          "center": 50,
+          "range": 50,
+          "initPosition": 50,
+          "isPair": false,
+          "pairBoard": -1,
+          "pairServo": -1,
+          "isPairMaster": false,
+          "name": "Board 0 Servo 3"
+        },
+        {
+          "index": 4,
+          "enabled": false,
+          "center": 50,
+          "range": 50,
+          "initPosition": 50,
+          "isPair": false,
+          "pairBoard": -1,
+          "pairServo": -1,
+          "isPairMaster": false,
+          "name": "Board 0 Servo 4"
+        },
+        {
+          "index": 5,
+          "enabled": false,
+          "center": 50,
+          "range": 50,
+          "initPosition": 50,
+          "isPair": false,
+          "pairBoard": -1,
+          "pairServo": -1,
+          "isPairMaster": false,
+          "name": "Board 0 Servo 5"
+        },
+        {
+          "index": 6,
+          "enabled": false,
+          "center": 50,
+          "range": 50,
+          "initPosition": 50,
+          "isPair": false,
+          "pairBoard": -1,
+          "pairServo": -1,
+          "isPairMaster": false,
+          "name": "Board 0 Servo 6"
+        },
+        {
+          "index": 7,
+          "enabled": false,
+          "center": 50,
+          "range": 50,
+          "initPosition": 50,
+          "isPair": false,
+          "pairBoard": -1,
+          "pairServo": -1,
+          "isPairMaster": false,
+          "name": "Board 0 Servo 7"
+        },
+        {
+          "index": 8,
+          "enabled": false,
+          "center": 50,
+          "range": 50,
+          "initPosition": 50,
+          "isPair": false,
+          "pairBoard": -1,
+          "pairServo": -1,
+          "isPairMaster": false,
+          "name": "Board 0 Servo 8"
+        },
+        {
+          "index": 9,
+          "enabled": false,
+          "center": 50,
+          "range": 50,
+          "initPosition": 50,
+          "isPair": false,
+          "pairBoard": -1,
+          "pairServo": -1,
+          "isPairMaster": false,
+          "name": "Board 0 Servo 9"
+        },
+        {
+          "index": 10,
+          "enabled": false,
+          "center": 50,
+          "range": 50,
+          "initPosition": 50,
+          "isPair": false,
+          "pairBoard": -1,
+          "pairServo": -1,
+          "isPairMaster": false,
+          "name": "Board 0 Servo 10"
+        },
+        {
+          "index": 11,
+          "enabled": false,
+          "center": 50,
+          "range": 50,
+          "initPosition": 50,
+          "isPair": false,
+          "pairBoard": -1,
+          "pairServo": -1,
+          "isPairMaster": false,
+          "name": "Board 0 Servo 11"
+        },
+        {
+          "index": 12,
+          "enabled": false,
+          "center": 50,
+          "range": 50,
+          "initPosition": 50,
+          "isPair": false,
+          "pairBoard": -1,
+          "pairServo": -1,
+          "isPairMaster": false,
+          "name": "Board 0 Servo 12"
+        },
+        {
+          "index": 13,
+          "enabled": false,
+          "center": 50,
+          "range": 50,
+          "initPosition": 50,
+          "isPair": false,
+          "pairBoard": -1,
+          "pairServo": -1,
+          "isPairMaster": false,
+          "name": "Board 0 Servo 13"
+        },
+        {
+          "index": 14,
+          "enabled": false,
+          "center": 50,
+          "range": 50,
+          "initPosition": 50,
+          "isPair": false,
+          "pairBoard": -1,
+          "pairServo": -1,
+          "isPairMaster": false,
+          "name": "Board 0 Servo 14"
+        },
+        {
+          "index": 15,
+          "enabled": false,
+          "center": 50,
+          "range": 50,
+          "initPosition": 50,
+          "isPair": false,
+          "pairBoard": -1,
+          "pairServo": -1,
+          "isPairMaster": false,
+          "name": "Board 0 Servo 15"
+        }
+      ]
+    }
+  ],
+  "scripts": []
+}

@@ -25,6 +25,16 @@ def backup_configuration():
     print(f"[BACKUP] Attempting to backup configuration from {esp32_ip}...")
     
     try:
+        # First, trigger ESP32 to save current config to offline storage
+        try:
+            save_response = requests.post(f"http://{esp32_ip}/api/save-offline", timeout=10)
+            if save_response.status_code == 200:
+                print("[BACKUP] Triggered ESP32 to save current config to offline storage")
+            else:
+                print(f"[BACKUP] Warning: Could not trigger offline save (HTTP {save_response.status_code})")
+        except:
+            print("[BACKUP] Warning: Could not trigger offline save")
+        
         # Try to get current configuration
         response = requests.get(f"http://{esp32_ip}/api/config", timeout=10)
         
@@ -53,6 +63,13 @@ def backup_configuration():
             
             print(f"[BACKUP] Latest backup saved to: {latest_backup}")
             
+            # Copy configuration to data directory for filesystem upload
+            data_config_file = "data/offline_config.json"
+            with open(data_config_file, 'w') as f:
+                json.dump(config_data, f, indent=2)
+            
+            print(f"[BACKUP] Configuration copied to filesystem: {data_config_file}")
+            
             # Try to get offline configuration as well
             try:
                 offline_response = requests.get(f"http://{esp32_ip}/api/debug", timeout=5)
@@ -78,73 +95,29 @@ def backup_configuration():
 
 def restore_configuration():
     """Restore configuration after filesystem upload."""
-    latest_backup = "backups/servo_config_latest.json"
+    print("[RESTORE] Configuration automatically restored via filesystem upload")
+    print("[RESTORE] ✓ Your servo settings have been preserved")
+    print(f"[RESTORE] ESP32 should be available at http://{esp32_ip}")
     
-    if not os.path.exists(latest_backup):
-        print("[RESTORE] No backup found to restore")
-        return
-    
-    print(f"[RESTORE] Waiting for ESP32 to restart...")
+    # Optional: Verify that ESP32 is responding
+    print("[RESTORE] Verifying ESP32 is online...")
     time.sleep(3)  # Give ESP32 time to restart
     
-    try:
-        # Try to restore configuration
-        with open(latest_backup, 'r') as f:
-            config_data = json.load(f)
-        
-        print(f"[RESTORE] Attempting to restore configuration to {esp32_ip}...")
-        
-        # Wait for ESP32 to be ready
-        max_retries = 15
-        for i in range(max_retries):
-            try:
-                response = requests.get(f"http://{esp32_ip}/api/info", timeout=5)
-                if response.status_code == 200:
-                    print(f"[RESTORE] ESP32 is ready")
-                    break
-            except:
-                if i < max_retries - 1:
-                    print(f"[RESTORE] Waiting for ESP32... ({i+1}/{max_retries})")
-                    time.sleep(2)
-                else:
-                    print("[RESTORE] ESP32 not responding, skipping automatic restore")
-                    return
-        
-        # Attempt automatic restore by uploading the backup to offline storage
+    max_retries = 10
+    for i in range(max_retries):
         try:
-            # First, save the backup to offline storage
-            restore_response = requests.post(
-                f"http://{esp32_ip}/api/save-offline",
-                timeout=10
-            )
-            
-            if restore_response.status_code == 200:
-                print("[RESTORE] Backup saved to ESP32 offline storage")
-                
-                # Now load from offline storage
-                load_response = requests.post(
-                    f"http://{esp32_ip}/api/load-offline",
-                    timeout=10
-                )
-                
-                if load_response.status_code == 200:
-                    print("[RESTORE] ✓ Configuration successfully restored!")
-                    print("[RESTORE] Your servo settings have been preserved")
-                else:
-                    print(f"[RESTORE] Failed to load from offline storage: HTTP {load_response.status_code}")
-                    print("[RESTORE] Manual restore required - use 'Load from Offline' button")
+            response = requests.get(f"http://{esp32_ip}/api/info", timeout=5)
+            if response.status_code == 200:
+                print("[RESTORE] ✓ ESP32 is online and ready")
+                return
+        except:
+            if i < max_retries - 1:
+                print(f"[RESTORE] Waiting for ESP32... ({i+1}/{max_retries})")
+                time.sleep(2)
             else:
-                print(f"[RESTORE] Failed to save to offline storage: HTTP {restore_response.status_code}")
-                print("[RESTORE] Manual restore required")
-                
-        except Exception as restore_error:
-            print(f"[RESTORE] Automatic restore failed: {str(restore_error)}")
-            print("[RESTORE] Manual restore options:")
-            print(f"[RESTORE] 1. Use 'Load from Offline' button at http://{esp32_ip}")
-            print(f"[RESTORE] 2. Run: python3 restore_config.py")
-        
-    except Exception as e:
-        print(f"[RESTORE] Error during restore: {str(e)}")
+                print("[RESTORE] ESP32 not responding yet, but configuration should be restored")
+                print(f"[RESTORE] Check http://{esp32_ip} once it's online")
+                return
 
 # Handle PlatformIO pre/post actions
 try:

@@ -45,7 +45,8 @@ function updateServoConfig(boardIndex, servoIndex, field, value) {
     const data = {
         board: boardIndex,
         servo: servoIndex,
-        [field]: value
+        field: field,
+        value: String(value)
     };
     
     console.log(`DEBUG: updateServoConfig called - Board ${boardIndex}, Servo ${servoIndex}, Field: ${field}, Value: ${value}`);
