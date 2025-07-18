@@ -9,19 +9,19 @@
       "servos": [
         {
           "index": 0,
-          "enabled": true,
+          "enabled": false,
           "center": 50,
           "range": 50,
           "initPosition": 50,
-          "isPair": true,
-          "pairBoard": 0,
-          "pairServo": 1,
-          "isPairMaster": true,
+          "isPair": false,
+          "pairBoard": -1,
+          "pairServo": -1,
+          "isPairMaster": false,
           "name": "Board 0 Servo 0"
         },
         {
           "index": 1,
-          "enabled": true,
+          "enabled": false,
           "center": 50,
           "range": 50,
           "initPosition": 50,
@@ -202,20 +202,5 @@
       ]
     }
   ],
-  "scripts": [
-    {
-      "index": 0,
-      "name": "test",
-      "description": "test",
-      "commands": "repeat 3 sweep",
-      "enabled": true
-    },
-    {
-      "index": 1,
-      "name": "sweep",
-      "description": "sweep",
-      "commands": "sweep 0 0 0 100 1000; sweep 0 0 100 0 1000",
-      "enabled": true
-    }
-  ]
+  "scripts": []
 }
