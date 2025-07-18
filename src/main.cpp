@@ -36,9 +36,11 @@ void initLittleFS() {
 
 void initWiFi() {
   WiFi.mode(WIFI_AP);
-  WiFi.softAP("nixon");
+  WiFi.softAP("nixon", "servo123");
   Serial.println("WiFi Access Point started");
   Serial.print("AP SSID: nixon");
+  Serial.println();
+  Serial.print("AP Password: servo123");
   Serial.println();
   Serial.print("AP IP address: ");
   Serial.println(WiFi.softAPIP());

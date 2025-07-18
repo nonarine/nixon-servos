@@ -68,8 +68,22 @@ function updateServoConfig(boardIndex, servoIndex, field, value) {
                 configuration.boards[boardIndex].servos[servoIndex][field] = value;
             }
             
-            // If isPairMaster was updated, trigger a re-render to update slave visibility
-            if (field === 'isPairMaster') {
+            // If isPairMaster was updated, handle slave servo enabling and trigger re-render
+            if (field === 'isPairMaster' && value === true) {
+                console.log(`DEBUG: isPairMaster updated to ${value}, enabling slave servo and triggering re-render`);
+                
+                // Get the current servo configuration to find the paired servo
+                const servo = configuration.boards[boardIndex].servos[servoIndex];
+                if (servo.pairBoard >= 0 && servo.pairServo >= 0) {
+                    // Automatically enable the slave servo
+                    console.log(`DEBUG: Auto-enabling slave servo ${servo.pairBoard}:${servo.pairServo}`);
+                    updateServoConfig(servo.pairBoard, servo.pairServo, 'enabled', true);
+                }
+                
+                setTimeout(() => {
+                    renderConfiguration();
+                }, 500);
+            } else if (field === 'isPairMaster') {
                 console.log(`DEBUG: isPairMaster updated to ${value}, triggering re-render`);
                 setTimeout(() => {
                     renderConfiguration();
