@@ -292,10 +292,23 @@ String ServoController::executeRepeatCommand(const String& args) {
     return "Error: No command specified to repeat";
   }
   
+  // Check if this is a script name (single word that matches a script)
+  String processedCommand = command;
+  if (command.indexOf(' ') == -1) {
+    // Single word - check if it's a script name
+    for (int i = 0; i < scriptCount; i++) {
+      if (String(scriptActions[i].name) == command && scriptActions[i].enabled) {
+        processedCommand = "script " + command;
+        DebugConsole::getInstance().log("Repeat command detected script name: " + command, "info");
+        break;
+      }
+    }
+  }
+  
   // Create array of commands for the sequence
   String* commands = new String[repeatCount];
   for (int i = 0; i < repeatCount; i++) {
-    commands[i] = command;
+    commands[i] = processedCommand;
   }
   
   // Start the command sequence
@@ -305,7 +318,7 @@ String ServoController::executeRepeatCommand(const String& args) {
   delete[] commands;
   
   if (success) {
-    return "Success: Started command sequence with '" + command + "' repeated " + String(repeatCount) + " times";
+    return "Success: Started command sequence with '" + processedCommand + "' repeated " + String(repeatCount) + " times";
   } else {
     return "Error: Failed to start command sequence";
   }
