@@ -97,13 +97,14 @@ bool ServoController::executeScript(const String& name) {
   
   DebugConsole::getInstance().log("Executing script: " + name, "info");
   
-  // Execute commands separated by semicolons or newlines with proper timing
+  // Parse commands separated by semicolons or newlines into sequence
   String commands = String(scriptActions[index].commands);
   DebugConsole::getInstance().log("Script commands: " + commands, "info");
   
-  int startPos = 0;
-  unsigned long currentDelay = 0;
+  // Parse commands into array for sequence execution
+  String* commandArray = new String[100]; // Max sequence size
   int commandCount = 0;
+  int startPos = 0;
   
   // Helper function to find next command separator (semicolon or newline)
   auto findNextSeparator = [&commands](int fromPos) -> int {
@@ -122,7 +123,7 @@ bool ServoController::executeScript(const String& name) {
   
   int endPos = findNextSeparator(startPos);
   
-  while (startPos < commands.length()) {
+  while (startPos < commands.length() && commandCount < 100) {
     String command;
     if (endPos == -1) {
       command = commands.substring(startPos);
@@ -135,27 +136,29 @@ bool ServoController::executeScript(const String& name) {
     
     command.trim();
     if (command.length() > 0) {
+      commandArray[commandCount] = command;
       commandCount++;
-      // Check if this is a sleep command
-      String lowerCommand = command;
-      lowerCommand.toLowerCase();
-      if (lowerCommand.startsWith("sleep ")) {
-        int sleepTime = command.substring(6).toInt();
-        if (sleepTime > 0 && sleepTime <= 10000) {
-          currentDelay += sleepTime;
-          DebugConsole::getInstance().log("Sleep command: " + String(sleepTime) + "ms, total delay: " + String(currentDelay), "info");
-        }
-      } else {
-        // Queue the command with accumulated delay
-        DebugConsole::getInstance().log("Queuing command: " + command + " with delay: " + String(currentDelay), "info");
-        queueCommand(command, currentDelay);
-      }
+      DebugConsole::getInstance().log("Parsed command: " + command, "info");
     }
   }
   
-  DebugConsole::getInstance().log("Script queued " + String(commandCount) + " commands", "success");
+  bool success = false;
+  if (commandCount > 0) {
+    // Start command sequence for sequential execution
+    success = startCommandSequence(commandArray, commandCount);
+    if (success) {
+      DebugConsole::getInstance().log("Started command sequence with " + String(commandCount) + " commands", "success");
+    } else {
+      DebugConsole::getInstance().log("Failed to start command sequence", "error");
+    }
+  } else {
+    DebugConsole::getInstance().log("No valid commands found in script", "error");
+  }
   
-  return true;
+  // Clean up
+  delete[] commandArray;
+  
+  return success;
 }
 
 String ServoController::getScriptsJson() {

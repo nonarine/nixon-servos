@@ -202,5 +202,13 @@
       ]
     }
   ],
-  "scripts": []
+  "scripts": [
+    {
+      "index": 0,
+      "name": "test",
+      "description": "test",
+      "commands": "repeat 3 sweep 0 0 0 100 1000",
+      "enabled": true
+    }
+  ]
 }
