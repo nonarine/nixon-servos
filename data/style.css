@@ -399,3 +399,166 @@ h1 {
     background-color: #17a2b8;
     color: white;
 }
+
+.btn-secondary {
+    background-color: #6c757d;
+    color: white;
+}
+
+/* Script Editor Styles */
+.navigation {
+    margin-bottom: 20px;
+}
+
+.script-editor {
+    background-color: #f8f9fa;
+    padding: 20px;
+    border-radius: 8px;
+    margin-bottom: 30px;
+}
+
+.form-group {
+    margin-bottom: 15px;
+}
+
+.form-group label {
+    display: block;
+    margin-bottom: 5px;
+    font-weight: bold;
+}
+
+.form-group input,
+.form-group textarea {
+    width: 100%;
+    padding: 8px;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    font-size: 14px;
+}
+
+.form-group textarea {
+    resize: vertical;
+    font-family: 'Courier New', monospace;
+}
+
+.form-actions {
+    display: flex;
+    gap: 10px;
+}
+
+.script-list {
+    margin-bottom: 30px;
+}
+
+.script-card {
+    background-color: white;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    padding: 15px;
+    margin-bottom: 15px;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+
+.script-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 10px;
+}
+
+.script-header h3 {
+    margin: 0;
+    color: #333;
+}
+
+.script-actions {
+    display: flex;
+    gap: 5px;
+}
+
+.script-description {
+    margin-bottom: 10px;
+    color: #666;
+    font-style: italic;
+}
+
+.script-commands {
+    margin-bottom: 10px;
+}
+
+.script-commands code {
+    background-color: #f8f9fa;
+    padding: 8px;
+    border-radius: 4px;
+    display: block;
+    font-family: 'Courier New', monospace;
+    font-size: 12px;
+    word-wrap: break-word;
+}
+
+.script-status {
+    display: inline-block;
+    padding: 2px 8px;
+    border-radius: 12px;
+    font-size: 12px;
+    font-weight: bold;
+}
+
+.script-status.enabled {
+    background-color: #d4edda;
+    color: #155724;
+}
+
+.script-status.disabled {
+    background-color: #f8d7da;
+    color: #721c24;
+}
+
+.no-scripts {
+    text-align: center;
+    color: #666;
+    font-style: italic;
+    padding: 20px;
+}
+
+.command-examples {
+    background-color: #f8f9fa;
+    padding: 20px;
+    border-radius: 8px;
+}
+
+.examples-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: 15px;
+    margin-top: 15px;
+}
+
+.example-card {
+    background-color: white;
+    padding: 15px;
+    border-radius: 6px;
+    border: 1px solid #ddd;
+}
+
+.example-card h4 {
+    margin-top: 0;
+    margin-bottom: 10px;
+    color: #333;
+}
+
+.example-card code {
+    background-color: #f1f3f4;
+    padding: 4px 8px;
+    border-radius: 4px;
+    font-family: 'Courier New', monospace;
+    font-size: 12px;
+    display: block;
+    margin-bottom: 8px;
+}
+
+.example-card p {
+    margin: 0;
+    color: #666;
+    font-size: 13px;
+}

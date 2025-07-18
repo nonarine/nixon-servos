@@ -29,4 +29,11 @@ public:
   void handleGetDebug(AsyncWebServerRequest *request);
   void handleClearDebug(AsyncWebServerRequest *request);
   void handleCommand(AsyncWebServerRequest *request, uint8_t *data, size_t len, size_t index, size_t total);
+  
+  // Script management handlers
+  void handleGetScripts(AsyncWebServerRequest *request);
+  void handlePostScript(AsyncWebServerRequest *request, uint8_t *data, size_t len, size_t index, size_t total);
+  void handlePutScript(AsyncWebServerRequest *request, uint8_t *data, size_t len, size_t index, size_t total);
+  void handleDeleteScript(AsyncWebServerRequest *request, uint8_t *data, size_t len, size_t index, size_t total);
+  void handleExecuteScript(AsyncWebServerRequest *request, uint8_t *data, size_t len, size_t index, size_t total);
 };

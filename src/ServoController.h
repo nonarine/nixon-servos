@@ -5,6 +5,7 @@
 #include <Adafruit_PWMServoDriver.h>
 #include <LittleFS.h>
 #include <ArduinoJson.h>
+#include <queue>
 #include "DebugConsole.h"
 
 #define SERVOMIN  150 // This is the 'minimum' pulse length count (out of 4096)
@@ -18,6 +19,7 @@
 
 const int MAX_BOARDS = 8;        // Maximum number of PCA9685 boards
 const int SERVOS_PER_BOARD = 16; // 16 servos per PCA9685 board
+const int MAX_SCRIPTS = 20;      // Maximum number of script actions
 
 // PCA9685 board structure
 struct PCA9685Board {
@@ -41,11 +43,28 @@ struct ServoConfig {
   char name[32];          // Human-readable name
 };
 
+// Script action structure
+struct ScriptAction {
+  char name[32];          // Script name
+  char description[64];   // Script description
+  char commands[512];     // Script commands (separated by semicolons)
+  bool enabled;           // Is this script active?
+};
+
+// Command queue item structure
+struct QueuedCommand {
+  String command;         // Command to execute
+  unsigned long executeTime; // When to execute (millis())
+};
+
 class ServoController {
 private:
   PCA9685Board boards[MAX_BOARDS];
   ServoConfig servoConfigs[MAX_BOARDS][SERVOS_PER_BOARD];
+  ScriptAction scriptActions[MAX_SCRIPTS];
+  std::queue<QueuedCommand> commandQueue;
   int detectedBoardCount;
+  int scriptCount;
   
   // Common I2C addresses for PCA9685 boards
   uint8_t commonAddresses[8] = {0x40, 0x41, 0x42, 0x43, 0x44, 0x45, 0x46, 0x47};
@@ -88,6 +107,21 @@ public:
   // Command interface
   String executeCommand(const String& command);
   
+  // Script management
+  bool addScript(const String& name, const String& description, const String& commands);
+  bool updateScript(int index, const String& name, const String& description, const String& commands);
+  bool deleteScript(int index);
+  bool executeScript(int index);
+  bool executeScript(const String& name);
+  String getScriptsJson();
+  ScriptAction* getScript(int index);
+  int getScriptCount() const { return scriptCount; }
+  
+  // Timer and queue management
+  void update();  // Call this regularly to process queued commands
+  bool queueCommand(const String& command, unsigned long delayMs = 0);
+  void clearQueue();
+  
 private:
   // Command parsing helpers
   String parseCommand(const String& command);
@@ -96,4 +130,7 @@ private:
   String executeConfigCommand(const String& args);
   String executePairCommand(const String& args);
   String executeHelpCommand();
+  
+  // Queue management helpers
+  String executeCommandImmediate(const String& command);
 };

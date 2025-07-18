@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Script Editor - Servo Controller</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="main-container">
+        <div class="container">
+            <h1>Script Editor</h1>
+            <div class="navigation">
+                <a href="index.html" class="btn btn-primary">Back to Main</a>
+            </div>
+            
+            <div class="script-editor">
+                <h2>Create New Script</h2>
+                <form id="scriptForm">
+                    <div class="form-group">
+                        <label for="scriptName">Script Name:</label>
+                        <input type="text" id="scriptName" name="scriptName" required maxlength="31">
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="scriptDescription">Description:</label>
+                        <input type="text" id="scriptDescription" name="scriptDescription" required maxlength="63">
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="scriptCommands">Commands (separate with semicolons):</label>
+                        <textarea id="scriptCommands" name="scriptCommands" rows="6" required placeholder="servo 0 0 50; servo 0 1 25; system init"></textarea>
+                    </div>
+                    
+                    <div class="form-actions">
+                        <button type="submit" class="btn btn-success">Save Script</button>
+                        <button type="button" class="btn btn-secondary" onclick="clearForm()">Clear</button>
+                    </div>
+                </form>
+            </div>
+            
+            <div class="script-list">
+                <h2>Existing Scripts</h2>
+                <div id="scriptsContainer">
+                    <!-- Scripts will be loaded here -->
+                </div>
+            </div>
+            
+            <div class="command-examples">
+                <h3>Command Examples</h3>
+                <div class="examples-grid">
+                    <div class="example-card">
+                        <h4>Basic Movement</h4>
+                        <code>servo 0 0 50</code>
+                        <p>Move servo 0 on board 0 to 50% position</p>
+                    </div>
+                    <div class="example-card">
+                        <h4>Multiple Servos</h4>
+                        <code>servo 0 0 25; servo 0 1 75</code>
+                        <p>Move multiple servos in sequence</p>
+                    </div>
+                    <div class="example-card">
+                        <h4>System Commands</h4>
+                        <code>system init; system save</code>
+                        <p>Initialize servos and save configuration</p>
+                    </div>
+                    <div class="example-card">
+                        <h4>Configuration</h4>
+                        <code>config 0 0 center 45</code>
+                        <p>Update servo configuration</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <div class="debug-console">
+        <h3>Debug Console</h3>
+        <div class="debug-messages" id="debugMessages">
+            <div class="debug-message info">
+                <span class="debug-timestamp">Script editor loaded</span>
+            </div>
+        </div>
+        <button class="debug-clear-btn" onclick="clearDebugConsole()">Clear Console</button>
+    </div>
+
+    <!-- Load modules in dependency order -->
+    <script src="utilities.js"></script>
+    <script src="api-client.js"></script>
+    <script src="command-interface.js"></script>
+    <script src="script-editor.js"></script>
+</body>
+</html>

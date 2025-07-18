@@ -87,8 +87,10 @@ void loop()
 {
   // Main loop - servos are now controlled via HTTP API
   // The web server handles requests asynchronously
-  // No active servo control needed in the main loop
+  
+  // Process queued commands with timers
+  servoController->update();
   
   // Small delay to prevent watchdog issues
-  delay(10);
+  delay(1);
 }

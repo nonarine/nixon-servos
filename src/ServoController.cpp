@@ -2,6 +2,7 @@
 
 ServoController::ServoController() {
   detectedBoardCount = 0;
+  scriptCount = 0;
   
   // Initialize all board pointers to nullptr
   for (int i = 0; i < MAX_BOARDS; i++) {
@@ -10,6 +11,14 @@ ServoController::ServoController() {
     boards[i].driver = nullptr;
     boards[i].address = 0;
     strcpy(boards[i].name, "");
+  }
+  
+  // Initialize script actions
+  for (int i = 0; i < MAX_SCRIPTS; i++) {
+    strcpy(scriptActions[i].name, "");
+    strcpy(scriptActions[i].description, "");
+    strcpy(scriptActions[i].commands, "");
+    scriptActions[i].enabled = false;
   }
   
   initializeServoConfigs();
@@ -231,6 +240,26 @@ void ServoController::loadConfiguration() {
     }
   }
   
+  // Load scripts if they exist
+  if (doc["scripts"].is<JsonArray>()) {
+    JsonArray scriptsArray = doc["scripts"].as<JsonArray>();
+    scriptCount = 0;
+    for (int i = 0; i < scriptsArray.size() && i < MAX_SCRIPTS; i++) {
+      JsonObject scriptObj = scriptsArray[i];
+      strncpy(scriptActions[scriptCount].name, scriptObj["name"] | "", sizeof(scriptActions[scriptCount].name) - 1);
+      scriptActions[scriptCount].name[sizeof(scriptActions[scriptCount].name) - 1] = '\0';
+      
+      strncpy(scriptActions[scriptCount].description, scriptObj["description"] | "", sizeof(scriptActions[scriptCount].description) - 1);
+      scriptActions[scriptCount].description[sizeof(scriptActions[scriptCount].description) - 1] = '\0';
+      
+      strncpy(scriptActions[scriptCount].commands, scriptObj["commands"] | "", sizeof(scriptActions[scriptCount].commands) - 1);
+      scriptActions[scriptCount].commands[sizeof(scriptActions[scriptCount].commands) - 1] = '\0';
+      
+      scriptActions[scriptCount].enabled = scriptObj["enabled"] | true;
+      scriptCount++;
+    }
+  }
+  
   DebugConsole::getInstance().log("Configuration loaded from " + String(CONFIG_FILE), "success");
 }
 
@@ -372,6 +401,17 @@ String ServoController::getConfigurationJson() {
     }
   }
   
+  // Add scripts to configuration
+  JsonArray scriptsArray = doc["scripts"].to<JsonArray>();
+  for (int i = 0; i < scriptCount; i++) {
+    JsonObject scriptObj = scriptsArray.add<JsonObject>();
+    scriptObj["index"] = i;
+    scriptObj["name"] = scriptActions[i].name;
+    scriptObj["description"] = scriptActions[i].description;
+    scriptObj["commands"] = scriptActions[i].commands;
+    scriptObj["enabled"] = scriptActions[i].enabled;
+  }
+  
   String response;
   serializeJson(doc, response);
   return response;
@@ -435,6 +475,29 @@ String ServoController::executeCommand(const String& command) {
     return executeConfigCommand(args);
   } else if (mainCommand == "pair") {
     return executePairCommand(args);
+  } else if (mainCommand == "script") {
+    if (args.length() == 0) {
+      return "Error: script command requires a script name. Usage: script <name>";
+    }
+    if (executeScript(args)) {
+      return "Success: Executed script '" + args + "'";
+    } else {
+      return "Error: Script '" + args + "' not found or disabled";
+    }
+  } else if (mainCommand == "sleep") {
+    if (args.length() == 0) {
+      return "Error: sleep command requires a time in milliseconds. Usage: sleep <milliseconds>";
+    }
+    int sleepTime = args.toInt();
+    if (sleepTime <= 0) {
+      return "Error: Sleep time must be a positive number";
+    }
+    if (sleepTime > 10000) {
+      return "Error: Sleep time cannot exceed 10000ms (10 seconds)";
+    }
+    // Queue the sleep command for later execution
+    queueCommand("sleep " + String(sleepTime), sleepTime);
+    return "Success: Sleep for " + String(sleepTime) + "ms scheduled";
   } else if (mainCommand == "help") {
     return executeHelpCommand();
   } else {
@@ -602,5 +665,229 @@ String ServoController::executeHelpCommand() {
          "system load - Load saved configuration\n"
          "config <board> <servo> <field> <value> - Update servo configuration\n"
          "pair <board1> <servo1> <board2> <servo2> - Pair two servos (first is master)\n"
+         "script <name> - Execute a saved script\n"
+         "sleep <milliseconds> - Wait for specified time (max 10000ms)\n"
          "help - Show this help message";
+}
+
+// Script Management Functions
+bool ServoController::addScript(const String& name, const String& description, const String& commands) {
+  if (scriptCount >= MAX_SCRIPTS) {
+    return false; // No more space
+  }
+  
+  // Check if script name already exists
+  for (int i = 0; i < scriptCount; i++) {
+    if (String(scriptActions[i].name) == name) {
+      return false; // Name already exists
+    }
+  }
+  
+  // Add new script
+  strncpy(scriptActions[scriptCount].name, name.c_str(), sizeof(scriptActions[scriptCount].name) - 1);
+  scriptActions[scriptCount].name[sizeof(scriptActions[scriptCount].name) - 1] = '\0';
+  
+  strncpy(scriptActions[scriptCount].description, description.c_str(), sizeof(scriptActions[scriptCount].description) - 1);
+  scriptActions[scriptCount].description[sizeof(scriptActions[scriptCount].description) - 1] = '\0';
+  
+  strncpy(scriptActions[scriptCount].commands, commands.c_str(), sizeof(scriptActions[scriptCount].commands) - 1);
+  scriptActions[scriptCount].commands[sizeof(scriptActions[scriptCount].commands) - 1] = '\0';
+  
+  scriptActions[scriptCount].enabled = true;
+  scriptCount++;
+  
+  return true;
+}
+
+bool ServoController::updateScript(int index, const String& name, const String& description, const String& commands) {
+  if (index < 0 || index >= scriptCount) {
+    return false;
+  }
+  
+  // Check if new name conflicts with existing scripts (except current one)
+  for (int i = 0; i < scriptCount; i++) {
+    if (i != index && String(scriptActions[i].name) == name) {
+      return false; // Name already exists
+    }
+  }
+  
+  // Update script
+  strncpy(scriptActions[index].name, name.c_str(), sizeof(scriptActions[index].name) - 1);
+  scriptActions[index].name[sizeof(scriptActions[index].name) - 1] = '\0';
+  
+  strncpy(scriptActions[index].description, description.c_str(), sizeof(scriptActions[index].description) - 1);
+  scriptActions[index].description[sizeof(scriptActions[index].description) - 1] = '\0';
+  
+  strncpy(scriptActions[index].commands, commands.c_str(), sizeof(scriptActions[index].commands) - 1);
+  scriptActions[index].commands[sizeof(scriptActions[index].commands) - 1] = '\0';
+  
+  return true;
+}
+
+bool ServoController::deleteScript(int index) {
+  if (index < 0 || index >= scriptCount) {
+    return false;
+  }
+  
+  // Shift scripts down
+  for (int i = index; i < scriptCount - 1; i++) {
+    scriptActions[i] = scriptActions[i + 1];
+  }
+  
+  scriptCount--;
+  return true;
+}
+
+bool ServoController::executeScript(int index) {
+  if (index < 0 || index >= scriptCount || !scriptActions[index].enabled) {
+    return false;
+  }
+  
+  return executeScript(String(scriptActions[index].name));
+}
+
+bool ServoController::executeScript(const String& name) {
+  // Find script by name
+  int index = -1;
+  for (int i = 0; i < scriptCount; i++) {
+    if (String(scriptActions[i].name) == name) {
+      index = i;
+      break;
+    }
+  }
+  
+  if (index == -1 || !scriptActions[index].enabled) {
+    return false;
+  }
+  
+  // Execute commands separated by semicolons with proper timing
+  String commands = String(scriptActions[index].commands);
+  int startPos = 0;
+  int endPos = commands.indexOf(';');
+  unsigned long currentDelay = 0;
+  
+  while (startPos < commands.length()) {
+    String command;
+    if (endPos == -1) {
+      command = commands.substring(startPos);
+      startPos = commands.length();
+    } else {
+      command = commands.substring(startPos, endPos);
+      startPos = endPos + 1;
+      endPos = commands.indexOf(';', startPos);
+    }
+    
+    command.trim();
+    if (command.length() > 0) {
+      // Check if this is a sleep command
+      if (command.toLowerCase().startsWith("sleep ")) {
+        int sleepTime = command.substring(6).toInt();
+        if (sleepTime > 0 && sleepTime <= 10000) {
+          currentDelay += sleepTime;
+        }
+      } else {
+        // Queue the command with accumulated delay
+        queueCommand(command, currentDelay);
+      }
+    }
+  }
+  
+  return true;
+}
+
+String ServoController::getScriptsJson() {
+  JsonDocument doc;
+  doc["success"] = true;
+  doc["count"] = scriptCount;
+  
+  JsonArray scripts = doc["scripts"].to<JsonArray>();
+  
+  for (int i = 0; i < scriptCount; i++) {
+    JsonObject script = scripts.add<JsonObject>();
+    script["index"] = i;
+    script["name"] = scriptActions[i].name;
+    script["description"] = scriptActions[i].description;
+    script["commands"] = scriptActions[i].commands;
+    script["enabled"] = scriptActions[i].enabled;
+  }
+  
+  String output;
+  serializeJson(doc, output);
+  return output;
+}
+
+ScriptAction* ServoController::getScript(int index) {
+  if (index < 0 || index >= scriptCount) {
+    return nullptr;
+  }
+  return &scriptActions[index];
+}
+
+// Timer and queue management implementation
+void ServoController::update() {
+  unsigned long currentTime = millis();
+  
+  while (!commandQueue.empty()) {
+    QueuedCommand& nextCommand = commandQueue.front();
+    
+    if (currentTime >= nextCommand.executeTime) {
+      // Execute the command
+      executeCommandImmediate(nextCommand.command);
+      commandQueue.pop();
+    } else {
+      // Commands are queued in order, so if this one isn't ready, none after it are
+      break;
+    }
+  }
+}
+
+bool ServoController::queueCommand(const String& command, unsigned long delayMs) {
+  QueuedCommand queuedCmd;
+  queuedCmd.command = command;
+  queuedCmd.executeTime = millis() + delayMs;
+  
+  commandQueue.push(queuedCmd);
+  return true;
+}
+
+void ServoController::clearQueue() {
+  while (!commandQueue.empty()) {
+    commandQueue.pop();
+  }
+}
+
+String ServoController::executeCommandImmediate(const String& command) {
+  String cmd = command;
+  cmd.trim();
+  cmd.toLowerCase();
+  
+  if (cmd.length() == 0) {
+    return "Error: Empty command";
+  }
+  
+  // Split command into parts
+  int spaceIndex = cmd.indexOf(' ');
+  String mainCommand = (spaceIndex > 0) ? cmd.substring(0, spaceIndex) : cmd;
+  String args = (spaceIndex > 0) ? cmd.substring(spaceIndex + 1) : "";
+  
+  // Route to appropriate command handler (excluding sleep and script commands)
+  if (mainCommand == "servo") {
+    return executeServoCommand(args);
+  } else if (mainCommand == "system") {
+    return executeSystemCommand(args);
+  } else if (mainCommand == "config") {
+    return executeConfigCommand(args);
+  } else if (mainCommand == "pair") {
+    return executePairCommand(args);
+  } else if (mainCommand == "help") {
+    return executeHelpCommand();
+  } else if (mainCommand == "sleep") {
+    // Sleep commands should not be executed immediately
+    return "Error: Sleep command cannot be executed immediately";
+  } else if (mainCommand == "script") {
+    // Script commands should not be executed immediately to avoid recursion
+    return "Error: Script command cannot be executed immediately";
+  } else {
+    return "Error: Unknown command '" + mainCommand + "'. Type 'help' for available commands.";
+  }
 }

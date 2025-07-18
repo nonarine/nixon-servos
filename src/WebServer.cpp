@@ -67,6 +67,31 @@ void WebServerManager::setupRoutes() {
     [this](AsyncWebServerRequest *request, uint8_t *data, size_t len, size_t index, size_t total) {
       this->handleCommand(request, data, len, index, total);
     });
+  
+  // Script management endpoints
+  server->on("/api/scripts", HTTP_GET, [this](AsyncWebServerRequest *request) {
+    this->handleGetScripts(request);
+  });
+  
+  server->on("/api/scripts", HTTP_POST, [](AsyncWebServerRequest *request){}, NULL,
+    [this](AsyncWebServerRequest *request, uint8_t *data, size_t len, size_t index, size_t total) {
+      this->handlePostScript(request, data, len, index, total);
+    });
+  
+  server->on("/api/scripts", HTTP_PUT, [](AsyncWebServerRequest *request){}, NULL,
+    [this](AsyncWebServerRequest *request, uint8_t *data, size_t len, size_t index, size_t total) {
+      this->handlePutScript(request, data, len, index, total);
+    });
+  
+  server->on("/api/scripts", HTTP_DELETE, [](AsyncWebServerRequest *request){}, NULL,
+    [this](AsyncWebServerRequest *request, uint8_t *data, size_t len, size_t index, size_t total) {
+      this->handleDeleteScript(request, data, len, index, total);
+    });
+  
+  server->on("/api/scripts/execute", HTTP_POST, [](AsyncWebServerRequest *request){}, NULL,
+    [this](AsyncWebServerRequest *request, uint8_t *data, size_t len, size_t index, size_t total) {
+      this->handleExecuteScript(request, data, len, index, total);
+    });
 }
 
 void WebServerManager::handleNotFound(AsyncWebServerRequest *request) {
@@ -222,6 +247,116 @@ void WebServerManager::handleCommand(AsyncWebServerRequest *request, uint8_t *da
     request->send(200, "application/json", responseStr);
   } else {
     String response = "{\"success\":false,\"message\":\"Invalid command format. Expected: {\\\"command\\\": \\\"your command here\\\"}\"}";
+    request->send(400, "application/json", response);
+  }
+}
+
+// Script Management Handlers
+void WebServerManager::handleGetScripts(AsyncWebServerRequest *request) {
+  String response = servoController->getScriptsJson();
+  request->send(200, "application/json", response);
+}
+
+void WebServerManager::handlePostScript(AsyncWebServerRequest *request, uint8_t *data, size_t len, size_t index, size_t total) {
+  String body = String((char*)data).substring(0, len);
+  JsonDocument doc;
+  deserializeJson(doc, body);
+  
+  if (doc["name"].is<String>() && doc["description"].is<String>() && doc["commands"].is<String>()) {
+    String name = doc["name"];
+    String description = doc["description"];
+    String commands = doc["commands"];
+    
+    if (servoController->addScript(name, description, commands)) {
+      servoController->saveConfiguration();
+      String response = "{\"success\":true,\"message\":\"Script added successfully\"}";
+      request->send(200, "application/json", response);
+    } else {
+      String response = "{\"success\":false,\"message\":\"Failed to add script. Name may already exist or script limit reached.\"}";
+      request->send(400, "application/json", response);
+    }
+  } else {
+    String response = "{\"success\":false,\"message\":\"Invalid script format. Expected: {\\\"name\\\": \\\"...\\\", \\\"description\\\": \\\"...\\\", \\\"commands\\\": \\\"...\\\"}\"}";
+    request->send(400, "application/json", response);
+  }
+}
+
+void WebServerManager::handlePutScript(AsyncWebServerRequest *request, uint8_t *data, size_t len, size_t index, size_t total) {
+  String body = String((char*)data).substring(0, len);
+  JsonDocument doc;
+  deserializeJson(doc, body);
+  
+  if (doc["index"].is<int>() && doc["name"].is<String>() && doc["description"].is<String>() && doc["commands"].is<String>()) {
+    int scriptIndex = doc["index"];
+    String name = doc["name"];
+    String description = doc["description"];
+    String commands = doc["commands"];
+    
+    if (servoController->updateScript(scriptIndex, name, description, commands)) {
+      servoController->saveConfiguration();
+      String response = "{\"success\":true,\"message\":\"Script updated successfully\"}";
+      request->send(200, "application/json", response);
+    } else {
+      String response = "{\"success\":false,\"message\":\"Failed to update script. Index may be invalid or name already exists.\"}";
+      request->send(400, "application/json", response);
+    }
+  } else {
+    String response = "{\"success\":false,\"message\":\"Invalid script format. Expected: {\\\"index\\\": 0, \\\"name\\\": \\\"...\\\", \\\"description\\\": \\\"...\\\", \\\"commands\\\": \\\"...\\\"}\"}";
+    request->send(400, "application/json", response);
+  }
+}
+
+void WebServerManager::handleDeleteScript(AsyncWebServerRequest *request, uint8_t *data, size_t len, size_t index, size_t total) {
+  String body = String((char*)data).substring(0, len);
+  JsonDocument doc;
+  deserializeJson(doc, body);
+  
+  if (doc["index"].is<int>()) {
+    int scriptIndex = doc["index"];
+    
+    if (servoController->deleteScript(scriptIndex)) {
+      servoController->saveConfiguration();
+      String response = "{\"success\":true,\"message\":\"Script deleted successfully\"}";
+      request->send(200, "application/json", response);
+    } else {
+      String response = "{\"success\":false,\"message\":\"Failed to delete script. Index may be invalid.\"}";
+      request->send(400, "application/json", response);
+    }
+  } else {
+    String response = "{\"success\":false,\"message\":\"Invalid format. Expected: {\\\"index\\\": 0}\"}";
+    request->send(400, "application/json", response);
+  }
+}
+
+void WebServerManager::handleExecuteScript(AsyncWebServerRequest *request, uint8_t *data, size_t len, size_t index, size_t total) {
+  String body = String((char*)data).substring(0, len);
+  JsonDocument doc;
+  deserializeJson(doc, body);
+  
+  if (doc["name"].is<String>()) {
+    String scriptName = doc["name"];
+    
+    if (servoController->executeScript(scriptName)) {
+      DebugConsole::getInstance().log("Script executed: " + scriptName, "info");
+      String response = "{\"success\":true,\"message\":\"Script executed successfully\"}";
+      request->send(200, "application/json", response);
+    } else {
+      String response = "{\"success\":false,\"message\":\"Failed to execute script. Script may not exist or be disabled.\"}";
+      request->send(400, "application/json", response);
+    }
+  } else if (doc["index"].is<int>()) {
+    int scriptIndex = doc["index"];
+    
+    if (servoController->executeScript(scriptIndex)) {
+      DebugConsole::getInstance().log("Script executed by index: " + String(scriptIndex), "info");
+      String response = "{\"success\":true,\"message\":\"Script executed successfully\"}";
+      request->send(200, "application/json", response);
+    } else {
+      String response = "{\"success\":false,\"message\":\"Failed to execute script. Index may be invalid or script disabled.\"}";
+      request->send(400, "application/json", response);
+    }
+  } else {
+    String response = "{\"success\":false,\"message\":\"Invalid format. Expected: {\\\"name\\\": \\\"...\\\"} or {\\\"index\\\": 0}\"}";
     request->send(400, "application/json", response);
   }
 }
