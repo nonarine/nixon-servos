@@ -9,6 +9,10 @@
 ServoController* servoController;
 WebServerManager* webServer;
 
+// Serial command buffer
+String serialCommand = "";
+bool serialCommandReady = false;
+
 
 
 
@@ -81,6 +85,57 @@ void setup()
   Serial.print("Visit http://");
   Serial.print(WiFi.localIP());
   Serial.println(" to configure servos");
+  Serial.println("Type 'help' for serial command interface");
+}
+
+void processSerialInput() {
+  // Read serial input character by character
+  while (Serial.available() > 0) {
+    char inChar = (char)Serial.read();
+    
+    if (inChar == '\n' || inChar == '\r') {
+      // End of command
+      if (serialCommand.length() > 0) {
+        serialCommandReady = true;
+      }
+    } else if (inChar == 8 || inChar == 127) {
+      // Backspace
+      if (serialCommand.length() > 0) {
+        serialCommand.remove(serialCommand.length() - 1);
+        Serial.print("\b \b");
+      }
+    } else if (inChar >= 32 && inChar <= 126) {
+      // Printable character
+      serialCommand += inChar;
+      Serial.print(inChar);
+    }
+  }
+}
+
+void executeSerialCommand() {
+  if (serialCommandReady) {
+    serialCommand.trim();
+    
+    if (serialCommand.length() > 0) {
+      Serial.println();
+      Serial.print("Executing: ");
+      Serial.println(serialCommand);
+      
+      // Execute command through ServoController
+      String result = servoController->executeCommand(serialCommand);
+      
+      // Print result
+      Serial.print("Result: ");
+      Serial.println(result);
+    }
+    
+    // Reset command buffer
+    serialCommand = "";
+    serialCommandReady = false;
+    
+    // Print prompt
+    Serial.print("servo> ");
+  }
 }
 
 void loop()
@@ -90,6 +145,10 @@ void loop()
   
   // Process queued commands with timers
   servoController->update();
+  
+  // Handle serial command input
+  processSerialInput();
+  executeSerialCommand();
   
   // Small delay to prevent watchdog issues
   delay(1);

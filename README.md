@@ -89,6 +89,16 @@ For multiple boards, daisy-chain the I2C connections and set unique addresses.
 3. **Configure Servos**: Enable servos and set parameters
 4. **Control Servos**: Use sliders for real-time position control
 
+### Serial Interface
+
+The ESP32 provides a command-line interface over Serial (115200 baud):
+
+1. **Connect Serial Monitor**: Open Serial Monitor at 115200 baud
+2. **Command Prompt**: Type commands at the `servo>` prompt
+3. **Real-time Feedback**: Commands execute immediately with results
+4. **Backspace Support**: Use backspace to edit commands
+5. **Help Command**: Type `help` for command reference
+
 ### Script Editor
 
 1. **Access Scripts**: Click "Script Editor" from main page
@@ -98,12 +108,21 @@ For multiple boards, daisy-chain the I2C connections and set unique addresses.
 
 ### Command Interface
 
-Commands can be sent via HTTP POST to `/api/command`:
+Commands can be sent via multiple interfaces:
 
+**HTTP API** - POST to `/api/command`:
 ```json
 {
   "command": "servo 0 0 75"
 }
+```
+
+**Serial Interface** - Type commands at the `servo>` prompt:
+```
+servo> servo 0 0 75
+Executing: servo 0 0 75
+Result: Success: Moved servo 0:0 to 75%
+servo> 
 ```
 
 ## Command Reference
@@ -249,21 +268,30 @@ nixon-servos/
    - Check power supply (servos need 5V)
    - Verify I2C connections
    - Ensure servo is enabled in configuration
+   - Test with serial command: `servo 0 0 50`
 
 2. **Board Not Detected**
    - Check I2C address (default: 0x40)
    - Verify SDA/SCL connections
    - Check power to PCA9685
+   - Use serial command: `system info`
 
 3. **Script Not Executing**
    - Verify script is enabled
    - Check command syntax
    - Monitor debug console for errors
+   - Test individual commands via serial interface
 
 4. **WiFi Connection Issues**
    - Verify credentials in `wifi_credentials.h`
    - Check WiFi signal strength
    - Monitor Serial output for connection status
+
+5. **Serial Interface Issues**
+   - Ensure baud rate is set to 115200
+   - Check USB cable connection
+   - Verify correct COM port selection
+   - Try typing `help` to test connectivity
 
 ## License
 
