@@ -3,6 +3,13 @@
 void ServoController::update() {
   unsigned long currentTime = millis();
   
+  // Update sweep actions
+  updateSweeps();
+  
+  // Update command sequences
+  updateCommandSequence();
+  
+  // Process command queue
   while (!commandQueue.empty()) {
     QueuedCommand& nextCommand = commandQueue.front();
     
@@ -51,6 +58,10 @@ String ServoController::executeCommandImmediate(const String& command) {
   // Route to appropriate command handler (excluding sleep and script commands)
   if (mainCommand == "servo") {
     return executeServoCommand(args);
+  } else if (mainCommand == "sweep") {
+    return executeSweepCommand(args);
+  } else if (mainCommand == "repeat") {
+    return executeRepeatCommand(args);
   } else if (mainCommand == "system") {
     return executeSystemCommand(args);
   } else if (mainCommand == "config") {

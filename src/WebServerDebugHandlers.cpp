@@ -13,8 +13,6 @@ void WebServerManager::handleNotFound(AsyncWebServerRequest *request) {
 }
 
 void WebServerManager::handleGetDebug(AsyncWebServerRequest *request) {
-  DebugConsole::getInstance().log("GET /api/debug - Get debug messages", "info");
-  
   String response = DebugConsole::getInstance().getMessagesJson();
   request->send(200, "application/json", response);
 }

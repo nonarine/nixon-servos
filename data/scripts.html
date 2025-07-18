@@ -28,8 +28,8 @@
                     </div>
                     
                     <div class="form-group">
-                        <label for="scriptCommands">Commands (separate with semicolons):</label>
-                        <textarea id="scriptCommands" name="scriptCommands" rows="6" required placeholder="servo 0 0 50; servo 0 1 25; system init"></textarea>
+                        <label for="scriptCommands">Commands (separate with semicolons or newlines):</label>
+                        <textarea id="scriptCommands" name="scriptCommands" rows="8" required placeholder="servo 0 0 50&#10;sleep 1000&#10;sweep 0 0 50 100 2000&#10;sleep 2500&#10;servo 0 0 50"></textarea>
                     </div>
                     
                     <div class="form-actions">
@@ -46,29 +46,221 @@
                 </div>
             </div>
             
-            <div class="command-examples">
-                <h3>Command Examples</h3>
-                <div class="examples-grid">
-                    <div class="example-card">
-                        <h4>Basic Movement</h4>
-                        <code>servo 0 0 50</code>
-                        <p>Move servo 0 on board 0 to 50% position</p>
+            <div class="command-documentation">
+                <h3>Script Command Reference</h3>
+                
+                <div class="command-section">
+                    <h4>Servo Control Commands</h4>
+                    <div class="command-item">
+                        <div class="command-syntax">
+                            <code>servo &lt;board&gt; &lt;servo&gt; &lt;position&gt;</code>
+                        </div>
+                        <div class="command-description">
+                            <p>Move a servo to a specific position (0-100%)</p>
+                            <div class="command-example">
+                                <strong>Example:</strong> <code>servo 0 0 50</code> - Move servo 0 on board 0 to 50% position
+                            </div>
+                        </div>
                     </div>
-                    <div class="example-card">
-                        <h4>Multiple Servos</h4>
-                        <code>servo 0 0 25; servo 0 1 75</code>
-                        <p>Move multiple servos in sequence</p>
+                    
+                    <div class="command-item">
+                        <div class="command-syntax">
+                            <code>sweep &lt;board&gt; &lt;servo&gt; &lt;start&gt; &lt;end&gt; &lt;duration_ms&gt;</code>
+                        </div>
+                        <div class="command-description">
+                            <p>Smoothly sweep a servo from start to end position over specified time</p>
+                            <div class="command-example">
+                                <strong>Example:</strong> <code>sweep 0 0 25 75 2000</code> - Sweep servo 0:0 from 25% to 75% over 2 seconds
+                            </div>
+                            <div class="command-notes">
+                                <strong>Notes:</strong> Duration: 100-60000ms, respects servo range limits, non-blocking
+                            </div>
+                        </div>
                     </div>
-                    <div class="example-card">
-                        <h4>System Commands</h4>
-                        <code>system init; system save</code>
-                        <p>Initialize servos and save configuration</p>
+                    
+                    <div class="command-item">
+                        <div class="command-syntax">
+                            <code>repeat &lt;count&gt; &lt;command&gt;</code>
+                        </div>
+                        <div class="command-description">
+                            <p>Execute a command multiple times in sequence</p>
+                            <div class="command-example">
+                                <strong>Example:</strong> <code>repeat 5 servo 0 0 75</code> - Move servo 0:0 to 75% position 5 times
+                            </div>
+                            <div class="command-notes">
+                                <strong>Notes:</strong> Count: 1-100, commands execute immediately without delays
+                            </div>
+                        </div>
                     </div>
-                    <div class="example-card">
-                        <h4>Configuration</h4>
-                        <code>config 0 0 center 45</code>
-                        <p>Update servo configuration</p>
+                </div>
+
+                <div class="command-section">
+                    <h4>System Commands</h4>
+                    <div class="command-item">
+                        <div class="command-syntax">
+                            <code>system info</code>
+                        </div>
+                        <div class="command-description">
+                            <p>Display system information (board count, servo count)</p>
+                        </div>
                     </div>
+                    
+                    <div class="command-item">
+                        <div class="command-syntax">
+                            <code>system init</code>
+                        </div>
+                        <div class="command-description">
+                            <p>Apply initial positions to all enabled servos</p>
+                        </div>
+                    </div>
+                    
+                    <div class="command-item">
+                        <div class="command-syntax">
+                            <code>system save</code>
+                        </div>
+                        <div class="command-description">
+                            <p>Save current configuration to persistent storage</p>
+                        </div>
+                    </div>
+                    
+                    <div class="command-item">
+                        <div class="command-syntax">
+                            <code>system load</code>
+                        </div>
+                        <div class="command-description">
+                            <p>Load configuration from persistent storage</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="command-section">
+                    <h4>Configuration Commands</h4>
+                    <div class="command-item">
+                        <div class="command-syntax">
+                            <code>config &lt;board&gt; &lt;servo&gt; &lt;field&gt; &lt;value&gt;</code>
+                        </div>
+                        <div class="command-description">
+                            <p>Update servo configuration parameters</p>
+                            <div class="command-example">
+                                <strong>Fields:</strong> enabled, center, range, initPosition, isPair, pairBoard, pairServo, isPairMaster, name
+                            </div>
+                            <div class="command-example">
+                                <strong>Examples:</strong><br>
+                                <code>config 0 0 enabled true</code> - Enable servo 0:0<br>
+                                <code>config 0 0 center 45</code> - Set center position to 45%<br>
+                                <code>config 0 0 range 30</code> - Set range to 30% (15-75%)
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="command-section">
+                    <h4>Pairing Commands</h4>
+                    <div class="command-item">
+                        <div class="command-syntax">
+                            <code>pair &lt;board1&gt; &lt;servo1&gt; &lt;board2&gt; &lt;servo2&gt;</code>
+                        </div>
+                        <div class="command-description">
+                            <p>Create inverse pairing between two servos (first servo becomes master)</p>
+                            <div class="command-example">
+                                <strong>Example:</strong> <code>pair 0 0 0 1</code> - Pair servo 0:0 (master) with servo 0:1 (slave)
+                            </div>
+                            <div class="command-notes">
+                                <strong>Notes:</strong> When master moves, slave moves in opposite direction
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="command-section">
+                    <h4>Timing Commands</h4>
+                    <div class="command-item">
+                        <div class="command-syntax">
+                            <code>sleep &lt;milliseconds&gt;</code>
+                        </div>
+                        <div class="command-description">
+                            <p>Wait for specified time before executing next command</p>
+                            <div class="command-example">
+                                <strong>Example:</strong> <code>sleep 1000</code> - Wait 1 second
+                            </div>
+                            <div class="command-notes">
+                                <strong>Notes:</strong> Range: 1-10000ms, non-blocking (uses timer system)
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="command-section">
+                    <h4>Script Execution</h4>
+                    <div class="command-item">
+                        <div class="command-syntax">
+                            <code>script &lt;name&gt;</code>
+                        </div>
+                        <div class="command-description">
+                            <p>Execute another script by name</p>
+                            <div class="command-example">
+                                <strong>Example:</strong> <code>script "wave_pattern"</code> - Execute the "wave_pattern" script
+                            </div>
+                            <div class="command-notes">
+                                <strong>Notes:</strong> Cannot be used in immediate execution mode (prevents recursion)
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="command-section">
+                    <h4>Example Scripts</h4>
+                    <div class="example-scripts">
+                        <div class="script-example">
+                            <h5>Basic Sweep Pattern</h5>
+                            <code>servo 0 0 25; sleep 500; sweep 0 0 25 75 2000; sleep 2500; sweep 0 0 75 25 1500</code>
+                            <p>Move to start position, wait, sweep to end, wait for completion, sweep back</p>
+                        </div>
+                        
+                        <div class="script-example">
+                            <h5>Multi-Servo Wave</h5>
+                            <code>sweep 0 0 0 100 3000; sleep 500; sweep 0 1 0 100 3000; sleep 500; sweep 0 2 0 100 3000</code>
+                            <p>Create a wave effect across multiple servos with staggered timing</p>
+                        </div>
+                        
+                        <div class="script-example">
+                            <h5>Configuration Setup</h5>
+                            <code>config 0 0 enabled true; config 0 0 center 50; config 0 0 range 40; system init</code>
+                            <p>Configure a servo and initialize to default positions</p>
+                        </div>
+                        
+                        <div class="script-example">
+                            <h5>Paired Servo Demo</h5>
+                            <code>pair 0 0 0 1; servo 0 0 25; sleep 1000; servo 0 0 75; sleep 1000; servo 0 0 50</code>
+                            <p>Pair two servos and demonstrate inverse movement</p>
+                        </div>
+                        
+                        <div class="script-example">
+                            <h5>Repeat Pattern (using newlines)</h5>
+                            <code>repeat 3 servo 0 0 25<br>sleep 500<br>repeat 3 servo 0 0 75<br>sleep 500<br>servo 0 0 50</code>
+                            <p>Use repeat command with newline separators for clean formatting</p>
+                        </div>
+                        
+                        <div class="script-example">
+                            <h5>Oscillation Pattern</h5>
+                            <code>repeat 10 sweep 0 0 25 75 1000<br>sleep 1200<br>repeat 10 sweep 0 0 75 25 1000</code>
+                            <p>Create oscillating patterns using repeat with sweep commands</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="command-tips">
+                    <h4>Tips</h4>
+                    <ul>
+                        <li><strong>Command Separation:</strong> Use semicolons (;) or newlines to separate commands</li>
+                        <li><strong>Formatting:</strong> Newlines make scripts more readable, semicolons allow compact one-liners</li>
+                        <li><strong>Repeat Commands:</strong> Use repeat to avoid typing the same command multiple times</li>
+                        <li><strong>Non-blocking:</strong> Scripts use a timer system - no delays in main loop</li>
+                        <li><strong>Range Limits:</strong> All servo movements respect configured center and range limits</li>
+                        <li><strong>Concurrent Operations:</strong> Multiple sweeps can run simultaneously</li>
+                        <li><strong>Error Handling:</strong> Invalid commands are logged to debug console</li>
+                        <li><strong>Position Values:</strong> All positions are percentages (0-100)</li>
+                    </ul>
                 </div>
             </div>
         </div>

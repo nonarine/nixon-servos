@@ -562,3 +562,136 @@ h1 {
     color: #666;
     font-size: 13px;
 }
+
+/* Command Documentation Styles */
+.command-documentation {
+    background-color: #f8f9fa;
+    padding: 20px;
+    border-radius: 8px;
+    margin-top: 30px;
+}
+
+.command-section {
+    margin-bottom: 30px;
+}
+
+.command-section h4 {
+    color: #333;
+    margin-bottom: 15px;
+    padding-bottom: 8px;
+    border-bottom: 2px solid #007bff;
+}
+
+.command-item {
+    background-color: white;
+    padding: 15px;
+    border-radius: 6px;
+    border: 1px solid #ddd;
+    margin-bottom: 15px;
+}
+
+.command-syntax {
+    margin-bottom: 10px;
+}
+
+.command-syntax code {
+    background-color: #e9ecef;
+    padding: 8px 12px;
+    border-radius: 4px;
+    font-family: 'Courier New', monospace;
+    font-size: 14px;
+    font-weight: bold;
+    color: #495057;
+    display: inline-block;
+}
+
+.command-description {
+    color: #666;
+    line-height: 1.5;
+}
+
+.command-example {
+    background-color: #f8f9fa;
+    padding: 8px 12px;
+    border-radius: 4px;
+    margin-top: 8px;
+    border-left: 3px solid #007bff;
+}
+
+.command-example code {
+    background-color: #e9ecef;
+    padding: 2px 6px;
+    border-radius: 3px;
+    font-family: 'Courier New', monospace;
+    font-size: 12px;
+}
+
+.command-notes {
+    background-color: #fff3cd;
+    padding: 8px 12px;
+    border-radius: 4px;
+    margin-top: 8px;
+    border-left: 3px solid #ffc107;
+    color: #856404;
+}
+
+.example-scripts {
+    margin-top: 15px;
+}
+
+.script-example {
+    background-color: white;
+    padding: 15px;
+    border-radius: 6px;
+    border: 1px solid #ddd;
+    margin-bottom: 15px;
+}
+
+.script-example h5 {
+    margin-top: 0;
+    margin-bottom: 10px;
+    color: #333;
+}
+
+.script-example code {
+    background-color: #f1f3f4;
+    padding: 8px 12px;
+    border-radius: 4px;
+    font-family: 'Courier New', monospace;
+    font-size: 12px;
+    display: block;
+    margin-bottom: 8px;
+    word-wrap: break-word;
+    overflow-wrap: break-word;
+}
+
+.script-example p {
+    margin: 0;
+    color: #666;
+    font-size: 13px;
+}
+
+.command-tips {
+    background-color: #d4edda;
+    padding: 15px;
+    border-radius: 6px;
+    border: 1px solid #c3e6cb;
+    margin-top: 20px;
+}
+
+.command-tips h4 {
+    margin-top: 0;
+    margin-bottom: 10px;
+    color: #155724;
+}
+
+.command-tips ul {
+    margin: 0;
+    padding-left: 20px;
+}
+
+.command-tips li {
+    margin-bottom: 5px;
+    color: #155724;
+    line-height: 1.4;
+}

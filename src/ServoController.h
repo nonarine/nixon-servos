@@ -57,14 +57,35 @@ struct QueuedCommand {
   unsigned long executeTime; // When to execute (millis())
 };
 
+struct CommandSequence {
+  String commands[100];   // Array of commands to execute in sequence
+  int currentIndex;       // Current command being executed
+  int totalCount;         // Total number of commands
+  unsigned long waitUntil; // Time to wait until before executing next command
+  bool active;            // Whether this sequence is active
+};
+
+struct SweepAction {
+  int boardIndex;
+  int servoIndex;
+  float startPosition;
+  float endPosition;
+  unsigned long startTime;
+  unsigned long duration;
+  bool active;
+};
+
 class ServoController {
 private:
   PCA9685Board boards[MAX_BOARDS];
   ServoConfig servoConfigs[MAX_BOARDS][SERVOS_PER_BOARD];
   ScriptAction scriptActions[MAX_SCRIPTS];
   std::queue<QueuedCommand> commandQueue;
+  SweepAction sweepActions[MAX_BOARDS * SERVOS_PER_BOARD];
+  CommandSequence commandSequence;
   int detectedBoardCount;
   int scriptCount;
+  int activeSweepCount;
   
   // Common I2C addresses for PCA9685 boards
   uint8_t commonAddresses[8] = {0x40, 0x41, 0x42, 0x43, 0x44, 0x45, 0x46, 0x47};
@@ -86,6 +107,12 @@ public:
   void setServoByPercent(int boardIndex, int servonum, float pct);
   void setServoToConfiguredPosition(int boardIndex, int servonum, float position);
   void applyInitialPositions();
+  
+  // Sweep control
+  bool startSweep(int boardIndex, int servoIndex, float startPos, float endPos, unsigned long durationMs);
+  void stopSweep(int boardIndex, int servoIndex);
+  void stopAllSweeps();
+  void updateSweeps();
   
   // Configuration management
   void saveConfiguration();
@@ -122,6 +149,10 @@ public:
   bool queueCommand(const String& command, unsigned long delayMs = 0);
   void clearQueue();
   
+  // Command sequence management
+  bool startCommandSequence(String* commands, int count);
+  void updateCommandSequence();
+  
 private:
   // Command parsing helpers
   String parseCommand(const String& command);
@@ -129,6 +160,8 @@ private:
   String executeSystemCommand(const String& args);
   String executeConfigCommand(const String& args);
   String executePairCommand(const String& args);
+  String executeSweepCommand(const String& args);
+  String executeRepeatCommand(const String& args);
   String executeHelpCommand();
   
   // Queue management helpers

@@ -97,14 +97,30 @@ bool ServoController::executeScript(const String& name) {
   
   DebugConsole::getInstance().log("Executing script: " + name, "info");
   
-  // Execute commands separated by semicolons with proper timing
+  // Execute commands separated by semicolons or newlines with proper timing
   String commands = String(scriptActions[index].commands);
   DebugConsole::getInstance().log("Script commands: " + commands, "info");
   
   int startPos = 0;
-  int endPos = commands.indexOf(';');
   unsigned long currentDelay = 0;
   int commandCount = 0;
+  
+  // Helper function to find next command separator (semicolon or newline)
+  auto findNextSeparator = [&commands](int fromPos) -> int {
+    int semicolonPos = commands.indexOf(';', fromPos);
+    int newlinePos = commands.indexOf('\n', fromPos);
+    int crPos = commands.indexOf('\r', fromPos);
+    
+    // Find the earliest separator position
+    int nextPos = -1;
+    if (semicolonPos != -1) nextPos = semicolonPos;
+    if (newlinePos != -1 && (nextPos == -1 || newlinePos < nextPos)) nextPos = newlinePos;
+    if (crPos != -1 && (nextPos == -1 || crPos < nextPos)) nextPos = crPos;
+    
+    return nextPos;
+  };
+  
+  int endPos = findNextSeparator(startPos);
   
   while (startPos < commands.length()) {
     String command;
@@ -114,7 +130,7 @@ bool ServoController::executeScript(const String& name) {
     } else {
       command = commands.substring(startPos, endPos);
       startPos = endPos + 1;
-      endPos = commands.indexOf(';', startPos);
+      endPos = findNextSeparator(startPos);
     }
     
     command.trim();
