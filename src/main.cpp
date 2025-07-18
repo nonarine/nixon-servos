@@ -35,16 +35,13 @@ void initLittleFS() {
 }
 
 void initWiFi() {
-  WiFi.mode(WIFI_STA);
-  WiFi.begin(WIFI_SSID, WIFI_PASSWORD);
-  Serial.print("Connecting to WiFi ..");
-  while (WiFi.status() != WL_CONNECTED) {
-    Serial.print('.');
-    delay(1000);
-  }
+  WiFi.mode(WIFI_AP);
+  WiFi.softAP("nixon");
+  Serial.println("WiFi Access Point started");
+  Serial.print("AP SSID: nixon");
   Serial.println();
-  Serial.print("Connected to WiFi. IP: ");
-  Serial.println(WiFi.localIP());
+  Serial.print("AP IP address: ");
+  Serial.println(WiFi.softAPIP());
 }
 
 
@@ -83,7 +80,7 @@ void setup()
   
   Serial.println("Setup complete!");
   Serial.print("Visit http://");
-  Serial.print(WiFi.localIP());
+  Serial.print(WiFi.softAPIP());
   Serial.println(" to configure servos");
   Serial.println("Type 'help' for serial command interface");
 }
