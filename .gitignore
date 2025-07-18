@@ -1,0 +1,39 @@
+# PlatformIO files
+.pio/
+.vscode/
+
+# WiFi credentials and sensitive data
+src/wifi_credentials.h
+src/secrets.h
+wifi_config.h
+secrets.h
+credentials.h
+
+# Backup files
+backups/
+*.backup
+*.bak
+
+# Temporary files
+*.tmp
+*.temp
+*~
+
+# OS generated files
+.DS_Store
+Thumbs.db
+
+# IDE files
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# Logs
+*.log
+logs/
+
+# Local configuration
+local_config.h
+local_settings.h
+EOF < /dev/null

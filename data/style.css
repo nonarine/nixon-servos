@@ -1,0 +1,401 @@
+body {
+    font-family: Arial, sans-serif;
+    margin: 0;
+    padding: 0;
+    background-color: #f5f5f5;
+    display: flex;
+    height: 100vh;
+    overflow: hidden;
+}
+
+.main-container {
+    flex: 1;
+    padding: 20px;
+    overflow-y: auto;
+    background-color: #f5f5f5;
+}
+
+.container {
+    max-width: 1200px;
+    margin: 0 auto;
+    background-color: white;
+    padding: 20px;
+    border-radius: 10px;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+}
+
+.debug-console {
+    width: 20%;
+    min-width: 300px;
+    background-color: #1e1e1e;
+    color: #00ff00;
+    padding: 10px;
+    font-family: 'Courier New', monospace;
+    font-size: 12px;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+}
+
+.debug-console h3 {
+    color: #ffffff;
+    margin-top: 0;
+    margin-bottom: 10px;
+    font-size: 14px;
+}
+
+.debug-messages {
+    flex: 1;
+    overflow-y: auto;
+    border: 1px solid #333;
+    padding: 10px;
+    background-color: #000;
+}
+
+.debug-message {
+    margin-bottom: 5px;
+    padding: 2px 5px;
+    border-radius: 3px;
+    word-wrap: break-word;
+}
+
+.debug-message.success {
+    background-color: rgba(0, 255, 0, 0.1);
+    color: #00ff00;
+}
+
+.debug-message.error {
+    background-color: rgba(255, 0, 0, 0.1);
+    color: #ff6666;
+}
+
+.debug-message.info {
+    background-color: rgba(0, 0, 255, 0.1);
+    color: #6666ff;
+}
+
+.debug-timestamp {
+    color: #888;
+    font-size: 10px;
+}
+
+h1 {
+    color: #333;
+    text-align: center;
+    margin-bottom: 30px;
+}
+
+.system-info {
+    background-color: #e8f4f8;
+    padding: 15px;
+    border-radius: 5px;
+    margin-bottom: 20px;
+}
+
+.board-section {
+    border: 2px solid #ddd;
+    border-radius: 8px;
+    margin-bottom: 20px;
+    padding: 15px;
+    background-color: #fafafa;
+}
+
+.board-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 15px;
+    padding-bottom: 10px;
+    border-bottom: 1px solid #ddd;
+}
+
+.board-title {
+    font-size: 18px;
+    font-weight: bold;
+    color: #333;
+}
+
+.board-address {
+    font-size: 14px;
+    color: #666;
+    background-color: #e0e0e0;
+    padding: 4px 8px;
+    border-radius: 4px;
+}
+
+.servo-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: 15px;
+}
+
+.servo-config {
+    border: 1px solid #ddd;
+    border-radius: 5px;
+    padding: 15px;
+    background-color: white;
+}
+
+.servo-config.enabled {
+    border-color: #4CAF50;
+    background-color: #f8fff8;
+}
+
+.servo-config.paired {
+    border-color: #2196F3;
+    background-color: #f0f8ff;
+}
+
+.servo-config.paired-slave {
+    border-color: #9C27B0;
+    background-color: #f3e5f5;
+}
+
+.paired-indicator {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.paired-label {
+    font-size: 12px;
+    color: #666;
+    font-style: italic;
+}
+
+.paired-slave-info {
+    padding: 10px;
+    background-color: #e8f5e8;
+    border-radius: 5px;
+    margin-top: 10px;
+    text-align: center;
+    color: #2e7d32;
+}
+
+.control-section {
+    margin-bottom: 15px;
+    padding: 10px;
+    background-color: #f9f9f9;
+    border-radius: 5px;
+    border-left: 3px solid #ddd;
+}
+
+.control-section h4 {
+    margin: 0 0 10px 0;
+    color: #333;
+    font-size: 14px;
+    font-weight: bold;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.control-section.pair-config {
+    border-left-color: #2196F3;
+    background-color: #f0f8ff;
+}
+
+.pair-info {
+    margin-top: 10px;
+    padding: 8px;
+    background-color: #e3f2fd;
+    border-radius: 3px;
+    font-size: 12px;
+}
+
+.pair-info p {
+    margin: 2px 0;
+}
+
+.debug-clear-btn {
+    margin-top: 10px;
+    padding: 5px 10px;
+    background-color: #666;
+    color: white;
+    border: none;
+    border-radius: 3px;
+    cursor: pointer;
+    font-size: 11px;
+}
+
+.debug-clear-btn:hover {
+    background-color: #555;
+}
+
+.servo-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 10px;
+}
+
+.servo-title {
+    font-weight: bold;
+    color: #333;
+}
+
+.servo-enabled {
+    margin-left: 10px;
+}
+
+.config-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 8px;
+}
+
+.config-row label {
+    font-weight: bold;
+    min-width: 80px;
+}
+
+.config-row input, .config-row select {
+    margin-left: 10px;
+    padding: 4px;
+    border: 1px solid #ddd;
+    border-radius: 3px;
+}
+
+.config-row input[type="range"] {
+    width: 100px;
+}
+
+.config-row input[type="number"] {
+    width: 60px;
+}
+
+.config-row input[type="text"] {
+    width: 120px;
+}
+
+.pair-config {
+    background-color: #f0f8ff;
+    padding: 10px;
+    border-radius: 5px;
+    margin-top: 10px;
+}
+
+.pair-config.hidden {
+    display: none;
+}
+
+.button-group {
+    display: flex;
+    gap: 10px;
+    margin-top: 10px;
+}
+
+.btn {
+    padding: 8px 16px;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 14px;
+}
+
+.btn-primary {
+    background-color: #007bff;
+    color: white;
+}
+
+.btn-success {
+    background-color: #28a745;
+    color: white;
+}
+
+.btn-warning {
+    background-color: #ffc107;
+    color: black;
+}
+
+.btn-danger {
+    background-color: #dc3545;
+    color: white;
+}
+
+.btn-small {
+    padding: 4px 8px;
+    font-size: 12px;
+}
+
+.btn:hover {
+    opacity: 0.8;
+}
+
+.global-actions {
+    text-align: center;
+    margin-bottom: 20px;
+}
+
+.hidden {
+    display: none;
+}
+
+/* Command Interface Styles */
+.command-interface {
+    margin-top: 15px;
+    padding: 10px;
+    border-top: 1px solid #333;
+}
+
+.command-interface h4 {
+    color: #ffffff;
+    margin-top: 0;
+    margin-bottom: 10px;
+    font-size: 12px;
+}
+
+.command-input-row {
+    display: flex;
+    gap: 5px;
+    margin-bottom: 10px;
+}
+
+.command-input {
+    flex: 1;
+    padding: 5px;
+    border: 1px solid #333;
+    border-radius: 3px;
+    background-color: #2d2d2d;
+    color: #ffffff;
+    font-family: 'Courier New', monospace;
+    font-size: 12px;
+}
+
+.command-input:focus {
+    outline: none;
+    border-color: #007bff;
+}
+
+.command-examples {
+    margin-top: 10px;
+}
+
+.command-examples strong {
+    color: #cccccc;
+    font-size: 11px;
+}
+
+.example-commands {
+    display: flex;
+    gap: 5px;
+    margin-top: 5px;
+    flex-wrap: wrap;
+}
+
+.example-commands .btn {
+    padding: 2px 6px;
+    font-size: 10px;
+    background-color: #444;
+    color: #ccc;
+    border: 1px solid #555;
+}
+
+.example-commands .btn:hover {
+    background-color: #555;
+}
+
+.btn-info {
+    background-color: #17a2b8;
+    color: white;
+}
